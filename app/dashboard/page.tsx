@@ -1,0 +1,171 @@
+import { redirect } from "next/navigation"
+import { createClient } from "@/lib/supabase/server"
+import DashboardLayout from "@/components/dashboard-layout"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Users, ClipboardCheck, GraduationCap, FileText } from "lucide-react"
+
+export default async function DashboardPage() {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase.auth.getUser()
+  if (error || !data?.user) {
+    redirect("/auth/login")
+  }
+
+  // Get teacher's subjects
+  const { data: teacherSubjects } = await supabase
+    .from("teacher_subjects")
+    .select(`
+      subjects (
+        id,
+        name
+      )
+    `)
+    .eq("teacher_id", data.user.id)
+
+  const subjects = teacherSubjects?.map((ts: any) => ts.subjects) || []
+
+  // Get some basic stats
+  const { count: totalStudents } = await supabase.from("students").select("*", { count: "exact", head: true })
+
+  const { count: todayAttendance } = await supabase
+    .from("attendance")
+    .select("*", { count: "exact", head: true })
+    .eq("teacher_id", data.user.id)
+    .eq("date", new Date().toISOString().split("T")[0])
+
+  return (
+    <DashboardLayout user={data.user}>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600">Selamat datang di sistem absensi dan penilaian siswa</p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Siswa</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalStudents || 0}</div>
+              <p className="text-xs text-muted-foreground">Siswa terdaftar</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Absensi Hari Ini</CardTitle>
+              <ClipboardCheck className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{todayAttendance || 0}</div>
+              <p className="text-xs text-muted-foreground">Siswa diabsen</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Mata Pelajaran</CardTitle>
+              <GraduationCap className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{subjects.length}</div>
+              <p className="text-xs text-muted-foreground">Yang diampu</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Laporan</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">-</div>
+              <p className="text-xs text-muted-foreground">Tersedia</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Teacher's Subjects */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Mata Pelajaran yang Diampu</CardTitle>
+            <CardDescription>Daftar mata pelajaran yang Anda ajarkan</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {subjects.length > 0 ? (
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {subjects.map((subject: any) => (
+                  <div key={subject.id} className="flex items-center p-3 bg-blue-50 rounded-lg">
+                    <GraduationCap className="h-5 w-5 text-blue-600 mr-3" />
+                    <span className="font-medium text-blue-900">{subject.name}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">Belum ada mata pelajaran yang terdaftar</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Aksi Cepat</CardTitle>
+            <CardDescription>Fitur yang sering digunakan</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <a
+                href="/dashboard/attendance"
+                className="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+              >
+                <ClipboardCheck className="h-6 w-6 text-green-600 mr-3" />
+                <div>
+                  <div className="font-medium text-green-900">Input Absensi</div>
+                  <div className="text-sm text-green-700">Catat kehadiran siswa</div>
+                </div>
+              </a>
+
+              <a
+                href="/dashboard/knowledge-grades"
+                className="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+              >
+                <GraduationCap className="h-6 w-6 text-blue-600 mr-3" />
+                <div>
+                  <div className="font-medium text-blue-900">Nilai Pengetahuan</div>
+                  <div className="text-sm text-blue-700">Input nilai UH, UTS, UAS</div>
+                </div>
+              </a>
+
+              <a
+                href="/dashboard/practice-grades"
+                className="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
+              >
+                <GraduationCap className="h-6 w-6 text-purple-600 mr-3" />
+                <div>
+                  <div className="font-medium text-purple-900">Nilai Praktek</div>
+                  <div className="text-sm text-purple-700">Input nilai praktek</div>
+                </div>
+              </a>
+
+              <a
+                href="/dashboard/reports"
+                className="flex items-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
+              >
+                <FileText className="h-6 w-6 text-orange-600 mr-3" />
+                <div>
+                  <div className="font-medium text-orange-900">Laporan</div>
+                  <div className="text-sm text-orange-700">Export data Excel</div>
+                </div>
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </DashboardLayout>
+  )
+}
