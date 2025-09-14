@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import DashboardLayout from "@/components/dashboard-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, ClipboardCheck, GraduationCap, FileText } from "lucide-react"
+import Link from "next/link"
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -12,27 +13,25 @@ export default async function DashboardPage() {
     redirect("/auth/login")
   }
 
-  // Get teacher's subjects
-  const { data: teacherSubjects } = await supabase
-    .from("teacher_subjects")
-    .select(`
-      subjects (
-        id,
-        name
-      )
-    `)
-    .eq("teacher_id", data.user.id)
+  const [teacherSubjectsResult, totalStudentsResult, todayAttendanceResult] = await Promise.all([
+    supabase
+      .from("teacher_subjects")
+      .select(`
+        subjects (
+          id,
+          name
+        )
+      `)
+      .eq("teacher_id", data.user.id),
+    supabase.from("students").select("*", { count: "exact", head: true }),
+    supabase
+      .from("attendance")
+      .select("*", { count: "exact", head: true })
+      .eq("teacher_id", data.user.id)
+      .eq("date", new Date().toISOString().split("T")[0]),
+  ])
 
-  const subjects = teacherSubjects?.map((ts: any) => ts.subjects) || []
-
-  // Get some basic stats
-  const { count: totalStudents } = await supabase.from("students").select("*", { count: "exact", head: true })
-
-  const { count: todayAttendance } = await supabase
-    .from("attendance")
-    .select("*", { count: "exact", head: true })
-    .eq("teacher_id", data.user.id)
-    .eq("date", new Date().toISOString().split("T")[0])
+  const subjects = teacherSubjectsResult.data?.map((ts: any) => ts.subjects) || []
 
   return (
     <DashboardLayout user={data.user}>
@@ -50,7 +49,7 @@ export default async function DashboardPage() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalStudents || 0}</div>
+              <div className="text-2xl font-bold">{totalStudentsResult.count || 0}</div>
               <p className="text-xs text-muted-foreground">Siswa terdaftar</p>
             </CardContent>
           </Card>
@@ -61,7 +60,7 @@ export default async function DashboardPage() {
               <ClipboardCheck className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{todayAttendance || 0}</div>
+              <div className="text-2xl font-bold">{todayAttendanceResult.count || 0}</div>
               <p className="text-xs text-muted-foreground">Siswa diabsen</p>
             </CardContent>
           </Card>
@@ -119,7 +118,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <a
+              <Link
                 href="/dashboard/attendance"
                 className="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
               >
@@ -128,9 +127,9 @@ export default async function DashboardPage() {
                   <div className="font-medium text-green-900">Input Absensi</div>
                   <div className="text-sm text-green-700">Catat kehadiran siswa</div>
                 </div>
-              </a>
+              </Link>
 
-              <a
+              <Link
                 href="/dashboard/knowledge-grades"
                 className="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
               >
@@ -139,9 +138,9 @@ export default async function DashboardPage() {
                   <div className="font-medium text-blue-900">Nilai Pengetahuan</div>
                   <div className="text-sm text-blue-700">Input nilai UH, UTS, UAS</div>
                 </div>
-              </a>
+              </Link>
 
-              <a
+              <Link
                 href="/dashboard/practice-grades"
                 className="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
               >
@@ -150,9 +149,9 @@ export default async function DashboardPage() {
                   <div className="font-medium text-purple-900">Nilai Praktek</div>
                   <div className="text-sm text-purple-700">Input nilai praktek</div>
                 </div>
-              </a>
+              </Link>
 
-              <a
+              <Link
                 href="/dashboard/reports"
                 className="flex items-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors"
               >
@@ -161,7 +160,7 @@ export default async function DashboardPage() {
                   <div className="font-medium text-orange-900">Laporan</div>
                   <div className="text-sm text-orange-700">Export data Excel</div>
                 </div>
-              </a>
+              </Link>
             </div>
           </CardContent>
         </Card>
