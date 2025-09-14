@@ -130,19 +130,25 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="w-full max-w-md">
-        <Card className="shadow-xl">
+    <div className="min-h-screen flex items-center justify-center bg-crystal-dark p-4 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-crystal-dark via-crystal-dark/95 to-crystal-dark/90" />
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-crystal-accent/20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-crystal-gold/20 rounded-full blur-3xl animate-pulse delay-1000" />
+
+      <div className="w-full max-w-md relative z-10">
+        <Card className="crystal-glass border-crystal-accent/30 shadow-2xl backdrop-blur-xl">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-gray-900">Daftar Guru</CardTitle>
-            <CardDescription className="text-gray-600">
+            <CardTitle className="text-2xl font-bold text-crystal-text">Daftar Guru</CardTitle>
+            <CardDescription className="text-crystal-text/70">
               Buat akun baru untuk sistem absensi dan penilaian
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Nama Lengkap</Label>
+                <Label htmlFor="name" className="text-crystal-text font-medium">
+                  Nama Lengkap
+                </Label>
                 <Input
                   id="name"
                   type="text"
@@ -150,10 +156,13 @@ export default function RegisterPage() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  className="crystal-input"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-crystal-text font-medium">
+                  Email
+                </Label>
                 <Input
                   id="email"
                   type="email"
@@ -161,40 +170,48 @@ export default function RegisterPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  className="crystal-input"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-crystal-text font-medium">
+                  Password
+                </Label>
                 <Input
                   id="password"
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  className="crystal-input"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Konfirmasi Password</Label>
+                <Label htmlFor="confirmPassword" className="text-crystal-text font-medium">
+                  Konfirmasi Password
+                </Label>
                 <Input
                   id="confirmPassword"
                   type="password"
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="crystal-input"
                 />
               </div>
 
               <div className="space-y-3">
-                <Label>Mata Pelajaran yang Diampu</Label>
-                <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
+                <Label className="text-crystal-text font-medium">Mata Pelajaran yang Diampu</Label>
+                <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto crystal-glass p-3 rounded-lg border border-crystal-accent/20">
                   {subjects.map((subject) => (
                     <div key={subject.id} className="flex items-center space-x-2">
                       <Checkbox
                         id={subject.id}
                         checked={selectedSubjects.includes(subject.id)}
                         onCheckedChange={(checked) => handleSubjectChange(subject.id, checked as boolean)}
+                        className="border-crystal-accent/50 data-[state=checked]:bg-crystal-accent data-[state=checked]:border-crystal-accent"
                       />
-                      <Label htmlFor={subject.id} className="text-sm font-normal cursor-pointer">
+                      <Label htmlFor={subject.id} className="text-sm font-normal cursor-pointer text-crystal-text/90">
                         {subject.name}
                       </Label>
                     </div>
@@ -202,14 +219,22 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">{error}</div>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              {error && (
+                <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 p-3 rounded-md backdrop-blur-sm">
+                  {error}
+                </div>
+              )}
+
+              <Button type="submit" className="w-full crystal-button" disabled={isLoading}>
                 {isLoading ? "Mendaftar..." : "Daftar"}
               </Button>
             </form>
             <div className="mt-6 text-center text-sm">
-              Sudah punya akun?{" "}
-              <Link href="/auth/login" className="text-blue-600 hover:text-blue-800 font-medium">
+              <span className="text-crystal-text/70">Sudah punya akun? </span>
+              <Link
+                href="/auth/login"
+                className="text-crystal-accent hover:text-crystal-gold font-medium transition-colors"
+              >
                 Masuk di sini
               </Link>
             </div>
