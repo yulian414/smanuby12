@@ -1,7 +1,8 @@
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import { Database } from "@/types/supabase" // opsional kalau kamu punya tipe Database
+// opsional kalau kamu punya tipe database dari Supabase
+// import { Database } from "@/types/supabase"
 
-// function gaya lama, tapi pakai auth-helpers
 export function createClient() {
-  return createClientComponentClient<Database>()
+  // Kalau kamu punya tipe Database bisa kasih generic <Database>
+  return createClientComponentClient()
 }
