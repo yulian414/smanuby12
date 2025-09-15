@@ -1,32 +1,47 @@
 import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/server"
 import DashboardLayout from "@/components/dashboard-layout"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import ChangePasswordForm from "@/components/change-password-form"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { ChangePasswordForm } from "@/components/change-password-form"
 
 export default async function ProfilePage() {
   const supabase = await createClient()
 
-  const { data, error } = await supabase.auth.getUser()
-  if (error || !data?.user) {
+  // ✅ ambil session dari cookie
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session?.user) {
     redirect("/auth/login")
   }
 
-  const { data: teacher } = await supabase.from("teachers").select("*").eq("id", data.user.id).single()
+  const user = session.user
 
+  // ambil data guru dari tabel teachers
+  const { data: teacher } = await supabase
+    .from("teachers")
+    .select("*")
+    .eq("id", user.id)
+    .single()
+
+  // ambil daftar mata pelajaran
   const { data: teacherSubjects } = await supabase
     .from("teacher_subjects")
-    .select(`
-      subjects (
-        name
-      )
-    `)
-    .eq("teacher_id", data.user.id)
+    .select(`subjects ( name )`)
+    .eq("teacher_id", user.id)
 
-  const subjectNames = teacherSubjects?.map((ts) => ts.subjects?.name).filter(Boolean) || []
+  const subjectNames =
+    teacherSubjects?.map((ts) => ts.subjects?.name).filter(Boolean) || []
 
   return (
-    <DashboardLayout user={data.user}>
+    <DashboardLayout user={user}>
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Profil</h1>
@@ -42,16 +57,26 @@ export default async function ProfilePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-700">Nama Lengkap</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Nama Lengkap
+                </label>
                 <p className="text-gray-900">{teacher?.name || "Belum diisi"}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700">Email</label>
-                <p className="text-gray-900">{data.user.email}</p>
+                <label className="text-sm font-medium text-gray-700">
+                  Email
+                </label>
+                <p className="text-gray-900">{user.email}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700">Mata Pelajaran</label>
-                <p className="text-gray-900">{subjectNames.length > 0 ? subjectNames.join(", ") : "Belum diisi"}</p>
+                <label className="text-sm font-medium text-gray-700">
+                  Mata Pelajaran
+                </label>
+                <p className="text-gray-900">
+                  {subjectNames.length > 0
+                    ? subjectNames.join(", ")
+                    : "Belum diisi"}
+                </p>
               </div>
             </CardContent>
           </Card>
