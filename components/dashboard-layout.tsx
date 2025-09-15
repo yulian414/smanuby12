@@ -56,29 +56,14 @@ export default function DashboardLayout({ children, user }: DashboardLayoutProps
     .slice(0, 2)
 
   return (
-    <div className="min-h-screen bg-background relative">
-      <div className="fixed top-10 right-10 w-20 h-20 rounded-full border border-primary/20 pointer-events-none">
-        <div className="absolute inset-2 rounded-full border border-primary/15 pulse-ring"></div>
-        <div className="absolute inset-4 rounded-full bg-primary/5 pulse-dot"></div>
-      </div>
-      <div className="fixed bottom-20 left-10 w-16 h-16 rounded-full border border-accent/20 pointer-events-none">
-        <div className="absolute inset-2 rounded-full border border-accent/15 pulse-ring"></div>
-        <div className="absolute inset-3 rounded-full bg-accent/5 pulse-dot"></div>
-      </div>
-
+    <div className="min-h-screen bg-gray-50">
+      {/* Mobile sidebar */}
       <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? "block" : "hidden"}`}>
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-        <div className="fixed inset-y-0 left-0 flex w-64 flex-col crystal-glass border-r border-border">
-          <div className="flex h-16 items-center justify-between px-4 border-b border-border">
-            <h1 className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              PulseOne System
-            </h1>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen(false)}
-              className="text-foreground hover:bg-card"
-            >
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white shadow-xl">
+          <div className="flex h-16 items-center justify-between px-4 border-b">
+            <h1 className="text-lg font-semibold text-gray-900">Sistem Sekolah</h1>
+            <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
               <X className="h-5 w-5" />
             </Button>
           </div>
@@ -87,10 +72,10 @@ export default function DashboardLayout({ children, user }: DashboardLayoutProps
               <Link
                 key={item.name}
                 href={item.href}
-                className="flex items-center px-3 py-3 text-sm font-medium text-foreground rounded-lg crystal-glass hover:bg-card/30 transition-all duration-200 group"
+                className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-gray-900"
                 onClick={() => setSidebarOpen(false)}
               >
-                <item.icon className="mr-3 h-5 w-5 text-primary group-hover:text-accent transition-colors" />
+                <item.icon className="mr-3 h-5 w-5" />
                 {item.name}
               </Link>
             ))}
@@ -98,21 +83,20 @@ export default function DashboardLayout({ children, user }: DashboardLayoutProps
         </div>
       </div>
 
+      {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex flex-col flex-grow crystal-glass border-r border-border">
-          <div className="flex h-16 items-center px-4 border-b border-border">
-            <h1 className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              PulseOne System
-            </h1>
+        <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
+          <div className="flex h-16 items-center px-4 border-b">
+            <h1 className="text-lg font-semibold text-gray-900">Sistem Sekolah</h1>
           </div>
           <nav className="flex-1 px-4 py-4 space-y-2">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="flex items-center px-3 py-3 text-sm font-medium text-foreground rounded-lg crystal-glass hover:bg-card/30 transition-all duration-200 group"
+                className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-gray-900"
               >
-                <item.icon className="mr-3 h-5 w-5 text-primary group-hover:text-accent transition-colors" />
+                <item.icon className="mr-3 h-5 w-5" />
                 {item.name}
               </Link>
             ))}
@@ -122,13 +106,9 @@ export default function DashboardLayout({ children, user }: DashboardLayoutProps
 
       {/* Main content */}
       <div className="lg:pl-64">
-        <div className="sticky top-0 z-40 flex h-16 items-center gap-x-4 border-b border-border crystal-glass px-4 sm:gap-x-6 sm:px-6 lg:px-8">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="lg:hidden text-foreground hover:bg-card"
-            onClick={() => setSidebarOpen(true)}
-          >
+        {/* Top navigation */}
+        <div className="sticky top-0 z-40 flex h-16 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+          <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </Button>
 
@@ -137,30 +117,28 @@ export default function DashboardLayout({ children, user }: DashboardLayoutProps
             <div className="flex items-center gap-x-4 lg:gap-x-6">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full crystal-glass hover:bg-card/30">
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-gradient-to-r from-primary/20 to-accent/20 text-foreground font-semibold">
-                        {userInitials}
-                      </AvatarFallback>
+                      <AvatarFallback className="bg-blue-100 text-blue-700">{userInitials}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 crystal-glass border-border" align="end" forceMount>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium text-foreground">{userName}</p>
+                      <p className="font-medium">{userName}</p>
                       <p className="w-[200px] truncate text-sm text-muted-foreground">{user?.email}</p>
                     </div>
                   </div>
-                  <DropdownMenuSeparator className="bg-border" />
-                  <DropdownMenuItem asChild className="hover:bg-card/30">
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
                     <Link href="/dashboard/profile">
-                      <User className="mr-2 h-4 w-4 text-primary" />
+                      <User className="mr-2 h-4 w-4" />
                       <span>Profil</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-border" />
-                  <DropdownMenuItem onClick={handleLogout} className="hover:bg-destructive/20 text-destructive">
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Keluar</span>
                   </DropdownMenuItem>
@@ -170,7 +148,8 @@ export default function DashboardLayout({ children, user }: DashboardLayoutProps
           </div>
         </div>
 
-        <main className="py-6 relative">
+        {/* Page content */}
+        <main className="py-6">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">{children}</div>
         </main>
       </div>
