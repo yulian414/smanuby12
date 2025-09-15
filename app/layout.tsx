@@ -11,9 +11,9 @@ export const metadata: Metadata = {
   description: "Sistem Absensi dan Input Nilai Siswa",
   generator: "v0.app",
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.jpg",
-    apple: "/apple-touch-icon.jpg",
+    icon: "/smanuby.png",
+    shortcut: "/smanuby.png",
+    apple: "/smanuby.png",
   },
 }
 
