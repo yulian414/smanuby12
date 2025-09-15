@@ -6,10 +6,10 @@ export function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       auth: {
-        persistSession: true,    // simpan session di localStorage
-        autoRefreshToken: true,  // refresh token otomatis
-        detectSessionInUrl: true // penting kalau pakai magic link / oauth
-      }
+        persistSession: true,     // simpan session di localStorage
+        autoRefreshToken: true,   // otomatis refresh access_token
+        detectSessionInUrl: true, // perlu kalau pakai magic link / oauth
+      },
     }
   )
 }
